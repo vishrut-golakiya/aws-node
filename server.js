@@ -6,7 +6,7 @@ const port = 3000;
 const server = http.createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World\n this is just a demo for ci/cd checking');
+  res.end('this is just a demo for ci/cd checking');
 });
 
 server.listen(port, hostname, () => {
