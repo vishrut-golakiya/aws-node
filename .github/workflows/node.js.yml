@@ -70,15 +70,20 @@ jobs:
             sudo npm install -g pm2
             sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
             server {
-              listen 80;
-              server_name _;
+              listen 80 default_server;
+              listen [::]:80 default_server;
 
               root /var/www/html;
+              
               index index.html index.htm index.nginx-debian.html;
 
+              server_name _;
+
               location / {
-                try_files \$uri \$uri/ =404;
-              }
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+                }
 
               location /api {
                 proxy_pass http://localhost:3000;
@@ -88,10 +93,10 @@ jobs:
               }
             }
             EOL
-            sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-            sudo nginx -s reload
+            sudo sudo systemctl restart nginx
             npm ci
             pm2 start server.js --name backend
+            pm2 restart backend
             EOF
 
 
