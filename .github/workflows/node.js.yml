@@ -48,7 +48,7 @@ jobs:
         run: npm install
       - run: npm ci  
       - run: npm install pm2 -g.
-      - run: pm2 restart Backed
+  
 
   deploy:
     runs-on: ubuntu-latest
