@@ -62,7 +62,7 @@ jobs:
         run: |
           echo "${EC2_SSH_KEY}" > practice.pem
           chmod 400 practice.pem
-          ssh -o StrictHostKeyChecking=no -i practice.pem ubuntu@${EC2_PUBLIC_IP} << 'EOF'
+          ssh -v -o StrictHostKeyChecking=no -i practice.pem ubuntu@${EC2_PUBLIC_IP} << 'EOF'
             git clone https://github.com/vishrut-golakiya/aws-node.git
             cd aws-node
             sudo apt update
