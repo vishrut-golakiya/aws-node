@@ -93,7 +93,7 @@ jobs:
               }
             }
             EOL
-            sudo sudo systemctl restart nginx
+            sudo systemctl restart nginx
             npm ci
             pm2 start server.js --name backend
             pm2 restart backend
