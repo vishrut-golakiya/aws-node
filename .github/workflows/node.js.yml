@@ -61,6 +61,10 @@ jobs:
           echo "${EC2_SSH_KEY}" > practice.pem
           chmod 600 practice.pem
           ssh -o StrictHostKeyChecking=no -i practice.pem ubuntu@${EC2_PUBLIC_IP} << 'EOF'
+            sudo apt update
+            sudo apt install node
+            sudo apt install npm
+            sudo npm install pm2 -g.
             git clone https://github.com/vishrut-golakiya/aws-node.git
             cd /home/ubuntu/aws-node
             npm ci
