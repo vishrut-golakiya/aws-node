@@ -93,6 +93,7 @@ jobs:
               }
             }
             EOL
+            # Remove the default Nginx index file
             sudo systemctl restart nginx
             npm ci
             pm2 start server.js --name backend
