@@ -68,7 +68,7 @@ jobs:
             git clone https://github.com/vishrut-golakiya/aws-node.git
             cd /home/ubuntu/aws-node
             npm ci
-            node server.js
+            pm2 restart Backed
           EOF
 
  
