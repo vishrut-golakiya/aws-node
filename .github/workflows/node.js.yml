@@ -68,10 +68,32 @@ jobs:
             sudo apt update
             sudo apt install -y nodejs npm nginx
             sudo npm install -g pm2
+            
+            sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
+            server {
+                listen 80 default_server;
+                listen [::]:80 default_server;
+                server_name _;
+
+                root /var/www/html;
+                index index.html index.htm index.nginx-debian.html;
+
+                location / {
+                try_files $uri $uri/ =404;
+                }
+
+                location /api {
+                proxy_pass http://localhost:3000;
+                proxy_set_header Host \$host;
+                proxy_set_header X-Real-IP \$remote_addr;
+                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+              }
+   
+          }
+          EOL
+            
             npm ci
             pm2 start server.js --name backend
-            
-        
-            EOF
+          EOF
             
             
