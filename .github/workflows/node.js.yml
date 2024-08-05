@@ -68,7 +68,8 @@ jobs:
             sudo apt update
             sudo apt install -y nodejs npm nginx
             sudo npm install -g pm2
-            
+            npm ci
+            pm2 start server.js --name backend
             sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
             server {
                 listen 80 default_server;
@@ -92,8 +93,7 @@ jobs:
           }
           EOL
             
-            npm ci
-            pm2 start server.js --name backend
+            
           EOF
             
             
