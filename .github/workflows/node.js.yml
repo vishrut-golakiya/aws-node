@@ -1,33 +1,7 @@
-# # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-# name: Node.js CI
-
-# on:
-#   push:
-#     branches: [ "master" ]
-
-# jobs:
-#   build:
-
-#     runs-on: self-hosted
-
-#     strategy:
-#       matrix:
-#         node-version: [12.x]
-#         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-#     steps:
-#     - uses: actions/checkout@v4
-#     - name: Use Node.js ${{ matrix.node-version }}
-#       uses: actions/setup-node@v4
-#       with:
-#         node-version: ${{ matrix.node-version }}
-#         cache: 'npm'
-#     - run: npm ci
-#     - run: pm2 restart Backed
-
-name: Node.js CI/CD
+name: Node.js CI
 
 on:
   push:
@@ -35,65 +9,91 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: pm2 restart Backed
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
+# name: Node.js CI/CD
 
-      - name: Install Dependencies
-        run: npm install
+# on:
+#   push:
+#     branches: [ "master" ]
 
-      - name: Install Global Packages
-        run: npm install -g pm2
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: SSH and deploy
-        env:
-          EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-        run: |
-          echo "${EC2_SSH_KEY}" > practice.pem
-          chmod 400 practice.pem
-          ssh -v -o StrictHostKeyChecking=no -i practice.pem ubuntu@${EC2_PUBLIC_IP} << 'EOF'
-            git clone https://github.com/vishrut-golakiya/aws-node.git
-            cd aws-node
-            sudo apt update
-            sudo apt install -y nodejs npm nginx
-            sudo npm install -g pm2
-            npm ci
-            pm2 start server.js --name backend
-            sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
-            server {
-                listen 80 default_server;
-                listen [::]:80 default_server;
-                server_name _;
+#       - name: Install Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 18.x
 
-                root /var/www/html;
-                index index.html index.htm index.nginx-debian.html;
+#       - name: Install Dependencies
+#         run: npm install
 
-                location / {
-                try_files $uri $uri/ =404;
-                }
+#       - name: Install Global Packages
+#         run: npm install -g pm2
 
-                location /api {
-                proxy_pass http://localhost:3000;
-                proxy_set_header Host \$host;
-                proxy_set_header X-Real-IP \$remote_addr;
-                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-              }
+#   deploy:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: SSH and deploy
+#         env:
+#           EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
+#           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+#         run: |
+#           echo "${EC2_SSH_KEY}" > practice.pem
+#           chmod 400 practice.pem
+#           ssh -v -o StrictHostKeyChecking=no -i practice.pem ubuntu@${EC2_PUBLIC_IP} << 'EOF'
+#             git clone https://github.com/vishrut-golakiya/aws-node.git
+#             cd aws-node
+#             sudo apt update
+#             sudo apt install -y nodejs npm nginx
+#             sudo npm install -g pm2
+#             npm ci
+#             pm2 start server.js --name backend
+#             sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
+#             server {
+#                 listen 80 default_server;
+#                 listen [::]:80 default_server;
+#                 server_name _;
+
+#                 root /var/www/html;
+#                 index index.html index.htm index.nginx-debian.html;
+
+#                 location / {
+#                 try_files $uri $uri/ =404;
+#                 }
+
+#                 location /api {
+#                 proxy_pass http://localhost:3000;
+#                 proxy_set_header Host \$host;
+#                 proxy_set_header X-Real-IP \$remote_addr;
+#                 proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+#               }
    
-          }
-          EOL
+#           }
+#           EOL
             
             
-          EOF
+#           EOF
             
             
