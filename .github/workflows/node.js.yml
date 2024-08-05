@@ -61,10 +61,10 @@ jobs:
           echo "${EC2_SSH_KEY}" > practice.pem
           chmod 600 practice.pem
           ssh -o StrictHostKeyChecking=no -i practice.pem ubuntu@${EC2_PUBLIC_IP} << 'EOF'
-            # docker pull vishrut0/demo-project:master
-            # docker stop project || true
-            # docker rm project || true
-            # docker run -d --name project -p 80:80 vishrut0/demo-project:master
+            git clone https://github.com/vishrut-golakiya/aws-node.git
+            cd /home/ubuntu/aws-node
+            npm ci
+            node server.js
           EOF
 
  
