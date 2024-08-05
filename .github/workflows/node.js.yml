@@ -67,7 +67,30 @@ jobs:
             sudo apt install node -y
             sudo apt install npm -y
             sudo npm i -g pm2
-            
+            udo tee /etc/nginx/sites-available/default > /dev/null <<EOL
+            server {
+              listen 80;
+              server_name _;
+
+            root /var/www/html;
+            index index.html index.htm index.nginx-debian.html;
+
+            location / {
+            # First attempt to serve request as file, then
+            # as directory, then fall back to displaying a 404.
+            try_files $uri $uri/ =404;
+          }
+
+          location /api {
+            rewrite ^\/api\/(.*)$ /api/$1 break;
+            proxy_pass http://localhost:3000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+
+            }
+          EOL
             npm ci
             pm2 start server.js --name=backend
             pm2 restart backend
